@@ -68,3 +68,39 @@ open("index.html","w",encoding="utf-8").write(f"""<!doctype html>
 <div class="langs"><a href="en.html" hreflang="en">English — BestBefore</a><a href="ru.html" hreflang="ru">Русский — Срокоед</a><a href="nb.html" hreflang="nb">Norsk — Matvakt</a></div></main></body></html>""")
 open("README.md","w").write("# BestBefore privacy policy\n\nStatic pages served by GitHub Pages: English, Russian (Срокоед) and Norwegian (Matvakt).\n\nSource of truth for the policy text is `build.py`; run `python3 build.py` to regenerate the HTML.\n")
 open(".nojekyll","w").write("")
+
+# --- Support page (the App Store's required Support URL) -------------------------------------
+SUPPORT = [
+ ("en", "BestBefore — Support", [
+  ("Contact", f'<p>Found a bug or have an idea? <a href="{ISSUES}">Open an issue on GitHub</a>. We read every one.</p>'),
+  ("Where is my data?", "<p>Your pantry is stored only on your phone. There is no account and no server, so we cannot see or recover it. Use <b>Settings → Data → Export backup</b> to save a copy, and import it on a new phone.</p>"),
+  ("Reminders don't arrive", "<p>Check that notifications are allowed for BestBefore in your phone's settings, and set the reminder time in <b>Settings → Notifications</b>.</p>"),
+  ("Shop reminders", "<p>Optional. Save a shop in <b>Settings → Shopping reminders</b>. To get reminders while the app is closed, allow location access <b>always</b> (iPhone) or <b>all the time</b> (Android).</p>"),
+  ("Deleting your data", "<p>Delete items in the app, use <b>Settings → Data → Clear All Pantry Data</b>, or uninstall the app.</p>"),
+ ]),
+ ("ru", "Срокоед — поддержка", [
+  ("Связаться с нами", f'<p>Нашли ошибку или есть идея? <a href="{ISSUES}">Создайте обращение (issue) на GitHub</a>. Мы читаем каждое.</p>'),
+  ("Где хранятся мои данные?", "<p>Продукты хранятся только на вашем телефоне. Аккаунта и сервера нет, поэтому мы не можем их увидеть или восстановить. Сохраните копию через <b>Настройки → Данные → Экспорт копии</b> и импортируйте её на новом телефоне.</p>"),
+  ("Не приходят напоминания", "<p>Проверьте, что уведомления для Срокоеда разрешены в настройках телефона, и задайте время в <b>Настройки → Уведомления</b>.</p>"),
+  ("Напоминания у магазина", "<p>По желанию. Сохраните магазин в <b>Настройки → Напоминания о покупках</b>. Чтобы напоминания приходили при закрытом приложении, разрешите доступ к геопозиции <b>всегда</b> (iPhone) или <b>в любом режиме</b> (Android).</p>"),
+  ("Удаление данных", "<p>Удалите продукты в приложении, воспользуйтесь <b>Настройки → Данные → Очистить все данные кладовой</b> или удалите приложение.</p>"),
+ ]),
+ ("nb", "Matvakt — brukerstøtte", [
+  ("Kontakt", f'<p>Fant du en feil eller har en idé? <a href="{ISSUES}">Opprett en sak (issue) på GitHub</a>. Vi leser alle.</p>'),
+  ("Hvor er dataene mine?", "<p>Matvarene lagres bare på telefonen din. Det finnes ingen konto og ingen server, så vi kan ikke se eller gjenopprette dem. Ta en kopi under <b>Innstillinger → Data → Eksporter sikkerhetskopi</b> og importer den på en ny telefon.</p>"),
+  ("Påminnelsene kommer ikke", "<p>Sjekk at varsler er tillatt for Matvakt i telefonens innstillinger, og velg tidspunkt under <b>Innstillinger → Varsler</b>.</p>"),
+  ("Butikkpåminnelser", "<p>Valgfritt. Lagre en butikk under <b>Innstillinger → Handlepåminnelser</b>. For påminnelser når appen er lukket, tillat posisjon <b>alltid</b> (iPhone) eller <b>hele tiden</b> (Android).</p>"),
+  ("Slette dataene", "<p>Slett varer i appen, bruk <b>Innstillinger → Data → Tøm alle data i matskapet</b>, eller avinstaller appen.</p>"),
+ ]),
+]
+body = '<nav>' + " ".join(f'<a href="#{c}">{n}</a>' for c, n in NAV) + '</nav>'
+for code, title, secs in SUPPORT:
+    body += f'<section id="{code}" lang="{code}"><h1>{title}</h1>' + "".join(f"<h2>{h}</h2>{p}" for h, p in secs) + "</section><hr>"
+open("support.html", "w", encoding="utf-8").write(f"""<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BestBefore — Support</title><style>{CSS} hr{{border:0;border-top:1px solid var(--bd);margin:40px 0}}</style></head>
+<body><main>{body}<p class="mut"><a href="index.html">Privacy Policy</a></p></main></body></html>""")
+s = open("index.html", encoding="utf-8").read()
+if "support.html" not in s:
+    s = s.replace('</div></main>', '</div><p><a href="support.html">Support · Поддержка · Brukerstøtte</a></p></main>')
+    open("index.html", "w", encoding="utf-8").write(s)
