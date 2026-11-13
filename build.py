@@ -17,12 +17,22 @@ def nav(cur):
     return "<nav>"+" ".join(f'<a href="{c}.html" hreflang="{c}"'+(' aria-current="page"' if c==cur else '')+f'>{n}</a>' for c,n in NAV)+"</nav>"
 
 VERTEX = "https://cloud.google.com/vertex-ai/generative-ai/docs/data-governance"
+# Email address for privacy requests made privately. Empty until the owner confirms the address to
+# publish; when set, the Contact section in every language gains one sentence with a mailto: link.
+# Never put a placeholder here.
+PRIVACY_EMAIL = ""
+def private_contact(sentence):
+    if not PRIVACY_EMAIL:
+        return ""
+    e = html.escape(PRIVACY_EMAIL)
+    return " " + sentence.format(f'<a href="mailto:{e}">{e}</a>')
 def L(*items):
     return "<ul>"+"".join(f"<li>{i}</li>" for i in items)+"</ul>"
 
 T = {}
 T["en"] = dict(app="BestBefore", title="Privacy Policy", upd="Last updated: 13 November 2026", secs=[
 ("The short version", ["<p>BestBefore keeps your pantry on your phone. You need no account, and there is no advertising and no analytics. Apart from crash reports (see “Crash reports”), we receive data only from people who buy recipes, and only once they start a purchase (see “Buying recipes”). If you do not buy recipes, nothing changes for you. We do not sell your personal data.</p>"]),
+("Who is responsible", ["<p>The data controller is Daniil Pastuhov, Norway: the individual developer who publishes BestBefore and is responsible for the data described in this policy. To reach him, see “Contact”.</p>"]),
 ("What the app stores", ["<p>Your pantry items, expiry dates, shopping list, settings (including your allergen list and cooking preferences), product photos, saved recipes and any shop locations you save are stored only in the app's local database on your device. They are not sent to us. The one exception is a recipe request from our server, which you send yourself; see “Recipes from our server”.</p>"]),
 ("Camera", ["<p>The camera is used to scan barcodes, read printed expiry dates and photograph food items. Recognition runs on your device (Google ML Kit on Android, Apple Vision on iOS). Photos you take are saved only on your device.</p>"]),
 ("Internet requests", ["<p>When you scan a barcode, the app asks <a href=\"https://world.openfoodfacts.org\">Open Food Facts</a> for the product's name and picture. That request contains the barcode number, and, as with any web request, Open Food Facts' servers can see your IP address. No name, account or device identifier is added by the app. Product pictures are also loaded from Open Food Facts. See their <a href=\""+OFF+"\">privacy policy</a>.</p>"]),
@@ -83,11 +93,12 @@ T["en"] = dict(app="BestBefore", title="Privacy Policy", upd="Last updated: 13 N
 ("Your control and your rights", ["<p>You can edit or delete any item inside the app. Uninstalling the app deletes its data from your device. If you bought recipes, you can delete your account as described in “Deleting your account”.</p>",
   "<p>You have the right to ask for a copy of your data, to have it corrected or deleted, to restrict or object to its use, and to complain to the data protection authority where you live (in Norway, Datatilsynet). To use these rights, contact us (see “Contact”). If you never signed in, we have no way to tell which data is yours.</p>"]),
 ("Changes", ["<p>If this policy changes, the new version will be published on this page with an updated date.</p>"]),
-("Contact", ["<p>Questions or requests? <a href=\""+ISSUES+"\">Open an issue</a> on GitHub. Issues are public, so do not put your email address or other personal details in them.</p>"]),
+("Contact", ["<p>Questions or requests? <a href=\""+ISSUES+"\">Open an issue</a> on GitHub. Issues are public, so do not put your email address or other personal details in them."+private_contact("For a privacy request you would rather not make in public, email {}.")+"</p>"]),
 ], home="Choose your language")
 
 T["ru"] = dict(app="Срокоед", title="Политика конфиденциальности", upd="Последнее обновление: 13 ноября 2026 г.", secs=[
 ("Коротко", ["<p>Срокоед хранит ваши продукты на вашем телефоне. Аккаунт не нужен, рекламы и аналитики нет. Помимо отчётов о сбоях (см. «Отчёты о сбоях»), мы получаем данные только от тех, кто покупает рецепты, и только после того, как покупка начата (см. «Покупка рецептов»). Если вы не покупаете рецепты, для вас ничего не меняется. Мы не продаём ваши персональные данные.</p>"]),
+("Кто отвечает за данные", ["<p>Оператор (контролёр) данных — Daniil Pastuhov, Норвегия: частный разработчик, который публикует Срокоед и отвечает за данные, описанные в этой политике. Как с ним связаться, см. «Контакты».</p>"]),
 ("Что хранит приложение", ["<p>Продукты, сроки годности, список покупок, настройки (включая список аллергенов и предпочтения в готовке), фотографии продуктов, сохранённые рецепты и сохранённые вами магазины хранятся только в локальной базе данных приложения на вашем устройстве. Они не отправляются нам. Единственное исключение — запрос рецепта с нашего сервера, который вы отправляете сами; см. «Рецепты с нашего сервера».</p>"]),
 ("Камера", ["<p>Камера используется для сканирования штрихкодов, распознавания напечатанных сроков годности и фотографирования продуктов. Распознавание выполняется на устройстве (Google ML Kit на Android, Apple Vision на iOS). Сделанные фотографии сохраняются только на вашем устройстве.</p>"]),
 ("Запросы в интернет", ["<p>Когда вы сканируете штрихкод, приложение запрашивает у <a href=\"https://world.openfoodfacts.org\">Open Food Facts</a> название и изображение продукта. Запрос содержит номер штрихкода, а серверы Open Food Facts, как и любого сайта, видят ваш IP-адрес. Приложение не добавляет имя, аккаунт или идентификатор устройства. Изображения продуктов тоже загружаются с Open Food Facts. См. их <a href=\""+OFF+"\">политику конфиденциальности</a>.</p>"]),
@@ -148,11 +159,12 @@ T["ru"] = dict(app="Срокоед", title="Политика конфиденц�
 ("Ваш контроль и ваши права", ["<p>Любой продукт можно изменить или удалить прямо в приложении. При удалении приложения его данные удаляются с вашего устройства. Если вы покупали рецепты, вы можете удалить аккаунт, как описано в разделе «Удаление аккаунта».</p>",
   "<p>Вы вправе запросить копию своих данных, потребовать их исправить или удалить, ограничить их использование или возразить против него, а также подать жалобу в орган по защите данных по месту жительства (в Норвегии — Datatilsynet). Чтобы воспользоваться этими правами, свяжитесь с нами (см. «Контакты»). Если вы ни разу не входили в аккаунт, мы не можем понять, какие данные ваши.</p>"]),
 ("Изменения", ["<p>Если политика изменится, новая версия будет опубликована на этой странице с обновлённой датой.</p>"]),
-("Контакты", ["<p>Есть вопросы или запросы? <a href=\""+ISSUES+"\">Создайте обращение (issue)</a> на GitHub. Обращения публичны, поэтому не указывайте в них адрес электронной почты и другие личные данные.</p>"]),
+("Контакты", ["<p>Есть вопросы или запросы? <a href=\""+ISSUES+"\">Создайте обращение (issue)</a> на GitHub. Обращения публичны, поэтому не указывайте в них адрес электронной почты и другие личные данные."+private_contact("Если вы не хотите отправлять запрос о персональных данных публично, напишите на {}.")+"</p>"]),
 ], home="Выберите язык")
 
 T["nb"] = dict(app="Matvakt", title="Personvernerklæring", upd="Sist oppdatert: 13. november 2026", secs=[
 ("Kort fortalt", ["<p>Matvakt oppbevarer matvarene dine på telefonen din. Du trenger ingen konto, og det finnes ingen reklame og ingen analyse. Utenom krasjrapporter (se «Krasjrapporter») mottar vi data bare fra dem som kjøper oppskrifter, og bare etter at de har startet et kjøp (se «Kjøp av oppskrifter»). Kjøper du ikke oppskrifter, endres ingenting for deg. Vi selger ikke personopplysningene dine.</p>"]),
+("Hvem som er ansvarlig", ["<p>Behandlingsansvarlig er Daniil Pastuhov, Norge: enkeltpersonen som utvikler og publiserer Matvakt, og som er ansvarlig for dataene som er beskrevet i denne erklæringen. Se «Kontakt» for hvordan du når ham.</p>"]),
 ("Hva appen lagrer", ["<p>Matvarer, utløpsdatoer, handleliste, innstillinger (også allergenlisten og matlagingsvalgene dine), bilder av produkter, lagrede oppskrifter og butikker du har lagret, lagres bare i appens lokale database på enheten din. De sendes ikke til oss. Det eneste unntaket er en forespørsel om oppskrift fra serveren vår, som du sender selv; se «Oppskrifter fra serveren vår».</p>"]),
 ("Kamera", ["<p>Kameraet brukes til å skanne strekkoder, lese påtrykte utløpsdatoer og ta bilder av matvarer. Gjenkjenningen skjer på enheten (Google ML Kit på Android, Apple Vision på iOS). Bilder du tar lagres bare på enheten din.</p>"]),
 ("Internett-forespørsler", ["<p>Når du skanner en strekkode, henter appen produktets navn og bilde fra <a href=\"https://world.openfoodfacts.org\">Open Food Facts</a>. Forespørselen inneholder strekkodenummeret, og som ved alle nettforespørsler kan Open Food Facts' servere se IP-adressen din. Appen legger ikke til navn, konto eller enhetsidentifikator. Produktbilder lastes også fra Open Food Facts. Se deres <a href=\""+OFF+"\">personvernerklæring</a>.</p>"]),
@@ -213,7 +225,7 @@ T["nb"] = dict(app="Matvakt", title="Personvernerklæring", upd="Sist oppdatert:
 ("Din kontroll og dine rettigheter", ["<p>Du kan endre eller slette alle matvarer i appen. Avinstallerer du appen, slettes dataene fra enheten din. Har du kjøpt oppskrifter, kan du slette kontoen din som beskrevet under «Slette kontoen».</p>",
   "<p>Du har rett til å be om en kopi av dataene dine, få dem rettet eller slettet, begrense eller protestere mot bruken av dem, og klage til datatilsynsmyndigheten der du bor (i Norge: Datatilsynet). For å bruke disse rettighetene, kontakt oss (se «Kontakt»). Hvis du aldri har logget inn, har vi ingen måte å vite hvilke data som er dine.</p>"]),
 ("Endringer", ["<p>Hvis erklæringen endres, publiseres den nye versjonen på denne siden med oppdatert dato.</p>"]),
-("Kontakt", ["<p>Spørsmål eller forespørsler? <a href=\""+ISSUES+"\">Opprett en sak (issue)</a> på GitHub. Saker er offentlige, så ikke skriv e-postadressen din eller andre personopplysninger i dem.</p>"]),
+("Kontakt", ["<p>Spørsmål eller forespørsler? <a href=\""+ISSUES+"\">Opprett en sak (issue)</a> på GitHub. Saker er offentlige, så ikke skriv e-postadressen din eller andre personopplysninger i dem."+private_contact("Hvis du ikke vil sende en forespørsel om personvern offentlig, send e-post til {}.")+"</p>"]),
 ], home="Velg språk")
 
 def page(code):
@@ -233,26 +245,40 @@ open("README.md","w").write("# BestBefore privacy policy\n\nStatic pages served 
 open(".nojekyll","w").write("")
 
 # --- Support page (the App Store's required Support URL) -------------------------------------
+APPLE_REFUND = "https://support.apple.com/118223"
+GOOGLE_REFUND = "https://support.google.com/googleplay/answer/2479637"
 SUPPORT = [
  ("en", "BestBefore — Support", [
   ("Contact", f'<p>Found a bug or have an idea? <a href="{ISSUES}">Open an issue on GitHub</a>. We read every one.</p>'),
-  ("Where is my data?", "<p>Your pantry is stored only on your phone. There is no account and no server, so we cannot see or recover it. Use <b>Settings → Data → Export backup</b> to save a copy, and import it on a new phone.</p>"),
+  ("Where is my data?", "<p>Your pantry is stored only on your phone, and you need no account for it, so we cannot see or recover it. Use <b>Settings → Data → Export backup</b> to save a copy, and import it on a new phone. If you buy recipes, Google Play or the App Store takes the payment and our server keeps your recipe balance; signing in is optional. See the <a href=\"en.html\">privacy policy</a>.</p>"),
   ("Reminders don't arrive", "<p>Check that notifications are allowed for BestBefore in your phone's settings, and set the reminder time in <b>Settings → Notifications</b>.</p>"),
   ("Shop reminders", "<p>Optional. Save a shop in <b>Settings → Shopping reminders</b>. To get reminders while the app is closed, allow location access <b>always</b> (iPhone) or <b>all the time</b> (Android).</p>"),
+  ("Where are my bought recipes?", "<p>If you have not signed in, they stay with this install of the app: if you delete the app or change phone, the unused ones are lost. If you signed in with Apple or Google, they are kept in your account: after reinstalling, or on a new phone, sign in the same way to use them.</p>"),
+  ("I paid, but no recipes were added", "<p>The app keeps trying to confirm the purchase and adds the recipes when it succeeds, so you do not need to buy again. Open the Recipe tab while online, or tap <b>Try now</b>. If the store is still waiting for your payment, the recipes are added when it confirms. If you would rather have your money back, ask the store for a refund.</p>"),
+  ("Refunds", f'<p>Refunds are handled by the store, not by us: <a href="{GOOGLE_REFUND}">Google Play</a> or <a href="{APPLE_REFUND}">the App Store</a>. Refunded recipes are taken off your balance.</p>'),
+  ("Deleting your account", "<p>Use <b>Recipe → Recipe settings → Delete account</b>. Your sign-in and email address are deleted from our server, and your unused recipes are lost and cannot be refunded. A record of your purchases stays, no longer linked to you. Your pantry and saved recipes stay on the phone.</p>"),
   ("Deleting your data", "<p>Delete items in the app, use <b>Settings → Data → Clear All Pantry Data</b>, or uninstall the app.</p>"),
  ]),
  ("ru", "Срокоед — поддержка", [
   ("Связаться с нами", f'<p>Нашли ошибку или есть идея? <a href="{ISSUES}">Создайте обращение (issue) на GitHub</a>. Мы читаем каждое.</p>'),
-  ("Где хранятся мои данные?", "<p>Продукты хранятся только на вашем телефоне. Аккаунта и сервера нет, поэтому мы не можем их увидеть или восстановить. Сохраните копию через <b>Настройки → Данные → Экспорт копии</b> и импортируйте её на новом телефоне.</p>"),
+  ("Где хранятся мои данные?", "<p>Продукты хранятся только на вашем телефоне, и аккаунт для этого не нужен, поэтому мы не можем их увидеть или восстановить. Сохраните копию через <b>Настройки → Данные → Экспорт копии</b> и импортируйте её на новом телефоне. Если вы покупаете рецепты, оплату принимает Google Play или App Store, а наш сервер хранит ваш баланс рецептов; входить в аккаунт не обязательно. См. <a href=\"ru.html\">политику конфиденциальности</a>.</p>"),
   ("Не приходят напоминания", "<p>Проверьте, что уведомления для Срокоеда разрешены в настройках телефона, и задайте время в <b>Настройки → Уведомления</b>.</p>"),
   ("Напоминания у магазина", "<p>По желанию. Сохраните магазин в <b>Настройки → Напоминания о покупках</b>. Чтобы напоминания приходили при закрытом приложении, разрешите доступ к геопозиции <b>всегда</b> (iPhone) или <b>в любом режиме</b> (Android).</p>"),
+  ("Где мои купленные рецепты?", "<p>Если вы не входили в аккаунт, они привязаны к этой установке приложения: если удалить приложение или сменить телефон, неиспользованные рецепты теряются. Если вы вошли через Apple или Google, они хранятся в вашем аккаунте: после переустановки или на новом телефоне войдите тем же способом, чтобы ими пользоваться.</p>"),
+  ("Я заплатил, но рецепты не добавились", "<p>Приложение продолжает подтверждать покупку и добавит рецепты, когда это получится, поэтому покупать заново не нужно. Откройте вкладку «Рецепт» при подключении к интернету или нажмите <b>Повторить сейчас</b>. Если магазин ещё ждёт оплату, рецепты добавятся, когда он её подтвердит. Если вы хотите вернуть деньги, попросите возврат в магазине.</p>"),
+  ("Возвраты", f'<p>Возвратами занимается магазин, а не мы: <a href="{GOOGLE_REFUND}">Google Play</a> или <a href="{APPLE_REFUND}">App Store</a>. Возвращённые рецепты списываются с вашего баланса.</p>'),
+  ("Удаление аккаунта", "<p>Откройте <b>Рецепт → Настройки рецептов → Удалить аккаунт</b>. Ваш вход и адрес электронной почты удаляются с нашего сервера, а неиспользованные рецепты теряются, и деньги за них не возвращаются. Запись о ваших покупках остаётся, но уже не связана с вами. Продукты и сохранённые рецепты остаются на телефоне.</p>"),
   ("Удаление данных", "<p>Удалите продукты в приложении, воспользуйтесь <b>Настройки → Данные → Очистить все данные кладовой</b> или удалите приложение.</p>"),
  ]),
  ("nb", "Matvakt — brukerstøtte", [
   ("Kontakt", f'<p>Fant du en feil eller har en idé? <a href="{ISSUES}">Opprett en sak (issue) på GitHub</a>. Vi leser alle.</p>'),
-  ("Hvor er dataene mine?", "<p>Matvarene lagres bare på telefonen din. Det finnes ingen konto og ingen server, så vi kan ikke se eller gjenopprette dem. Ta en kopi under <b>Innstillinger → Data → Eksporter sikkerhetskopi</b> og importer den på en ny telefon.</p>"),
+  ("Hvor er dataene mine?", "<p>Matvarene lagres bare på telefonen din, og du trenger ingen konto for dem, så vi kan ikke se eller gjenopprette dem. Ta en kopi under <b>Innstillinger → Data → Eksporter sikkerhetskopi</b> og importer den på en ny telefon. Kjøper du oppskrifter, tar Google Play eller App Store imot betalingen, og serveren vår holder saldoen din av oppskrifter; innlogging er valgfritt. Se <a href=\"nb.html\">personvernerklæringen</a>.</p>"),
   ("Påminnelsene kommer ikke", "<p>Sjekk at varsler er tillatt for Matvakt i telefonens innstillinger, og velg tidspunkt under <b>Innstillinger → Varsler</b>.</p>"),
   ("Butikkpåminnelser", "<p>Valgfritt. Lagre en butikk under <b>Innstillinger → Handlepåminnelser</b>. For påminnelser når appen er lukket, tillat posisjon <b>alltid</b> (iPhone) eller <b>hele tiden</b> (Android).</p>"),
+  ("Hvor er oppskriftene jeg har kjøpt?", "<p>Hvis du ikke har logget inn, hører de til denne installasjonen av appen: sletter du appen eller bytter telefon, går de ubrukte tapt. Hvis du logget inn med Apple eller Google, ligger de på kontoen din: etter ny installasjon, eller på en ny telefon, logger du inn på samme måte for å bruke dem.</p>"),
+  ("Jeg betalte, men fikk ingen oppskrifter", "<p>Appen fortsetter å prøve å bekrefte kjøpet og legger til oppskriftene når det lykkes, så du trenger ikke å kjøpe på nytt. Åpne Oppskrift-fanen med internettforbindelse, eller trykk <b>Prøv nå</b>. Hvis butikken fortsatt venter på betalingen, legges oppskriftene til når den bekrefter. Vil du heller ha pengene tilbake, ber du butikken om refusjon.</p>"),
+  ("Refusjoner", f'<p>Refusjoner håndteres av butikken, ikke av oss: <a href="{GOOGLE_REFUND}">Google Play</a> eller <a href="{APPLE_REFUND}">App Store</a>. Refunderte oppskrifter trekkes fra saldoen din.</p>'),
+  ("Slette kontoen", "<p>Bruk <b>Oppskrift → Oppskriftsinnstillinger → Slett konto</b>. Innloggingen og e-postadressen din slettes fra serveren vår, og ubrukte oppskrifter går tapt og kan ikke refunderes. En oversikt over kjøpene dine blir igjen, uten kobling til deg. Matvarene og de lagrede oppskriftene blir på telefonen.</p>"),
   ("Slette dataene", "<p>Slett varer i appen, bruk <b>Innstillinger → Data → Tøm alle data i matskapet</b>, eller avinstaller appen.</p>"),
  ]),
 ]
