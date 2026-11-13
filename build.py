@@ -21,8 +21,8 @@ VERTEX = "https://cloud.google.com/vertex-ai/generative-ai/docs/data-governance"
 # separately) so that neither this file nor the generated pages contain a harvestable address.
 # Both lists are empty until the owner confirms the address; while empty, the Contact sentence is
 # left out. To fill in: [ord(c) for c in "user"] and [ord(c) for c in "domain.tld"].
-PRIVACY_EMAIL_USER_CODES = []
-PRIVACY_EMAIL_DOMAIN_CODES = []
+PRIVACY_EMAIL_USER_CODES = [100, 97, 110, 105, 101, 108, 98, 101, 108, 108, 111, 110, 101, 119, 111, 114, 100]
+PRIVACY_EMAIL_DOMAIN_CODES = [103, 109, 97, 105, 108, 46, 99, 111, 109]
 EMAIL_WORDS = {"en": ("at", "dot"), "ru": ("собака", "точка"), "nb": ("krøllalfa", "punktum")}
 def _broken(text):
     # Readable text with an empty element in the middle, so the plain string is not in the source.
