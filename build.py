@@ -17,15 +17,32 @@ def nav(cur):
     return "<nav>"+" ".join(f'<a href="{c}.html" hreflang="{c}"'+(' aria-current="page"' if c==cur else '')+f'>{n}</a>' for c,n in NAV)+"</nav>"
 
 VERTEX = "https://cloud.google.com/vertex-ai/generative-ai/docs/data-governance"
-# Email address for privacy requests made privately. Empty until the owner confirms the address to
-# publish; when set, the Contact section in every language gains one sentence with a mailto: link.
-# Never put a placeholder here.
-PRIVACY_EMAIL = ""
-def private_contact(sentence):
-    if not PRIVACY_EMAIL:
+# Email address for privacy requests made privately, kept as character codes (user part and domain
+# separately) so that neither this file nor the generated pages contain a harvestable address.
+# Both lists are empty until the owner confirms the address; while empty, the Contact sentence is
+# left out. To fill in: [ord(c) for c in "user"] and [ord(c) for c in "domain.tld"].
+PRIVACY_EMAIL_USER_CODES = []
+PRIVACY_EMAIL_DOMAIN_CODES = []
+EMAIL_WORDS = {"en": ("at", "dot"), "ru": ("собака", "точка"), "nb": ("krøllalfa", "punktum")}
+def _broken(text):
+    # Readable text with an empty element in the middle, so the plain string is not in the source.
+    h = len(text) // 2
+    return html.escape(text[:h]) + "<span></span>" + html.escape(text[h:])
+def private_contact(sentence, lang):
+    """One sentence with the private address: a script turns it into a normal mailto link at load
+    time; without JavaScript the text reads e.g. "name at example dot com" in the page's language."""
+    if not (PRIVACY_EMAIL_USER_CODES and PRIVACY_EMAIL_DOMAIN_CODES):
         return ""
-    e = html.escape(PRIVACY_EMAIL)
-    return " " + sentence.format(f'<a href="mailto:{e}">{e}</a>')
+    at, dot = EMAIL_WORDS[lang]
+    user = "".join(map(chr, PRIVACY_EMAIL_USER_CODES))
+    domain = "".join(map(chr, PRIVACY_EMAIL_DOMAIN_CODES))
+    fallback = _broken(user) + f" {at} " + f" {dot} ".join(_broken(x) for x in domain.split("."))
+    js = ("(function(){var e=document.getElementById('pc');if(!e)return;"
+          "var f=function(c){return String.fromCharCode.apply(null,c)},"
+          f"a=f({PRIVACY_EMAIL_USER_CODES})+f([64])+f({PRIVACY_EMAIL_DOMAIN_CODES}),"
+          "l=document.createElement('a');l.href='mail'+'to:'+a;l.textContent=a;"
+          "e.textContent='';e.appendChild(l);})();")
+    return " " + sentence.format(f'<span id="pc">{fallback}</span><script>{js}</script>')
 def L(*items):
     return "<ul>"+"".join(f"<li>{i}</li>" for i in items)+"</ul>"
 
@@ -93,7 +110,7 @@ T["en"] = dict(app="BestBefore", title="Privacy Policy", upd="Last updated: 13 N
 ("Your control and your rights", ["<p>You can edit or delete any item inside the app. Uninstalling the app deletes its data from your device. If you bought recipes, you can delete your account as described in “Deleting your account”.</p>",
   "<p>You have the right to ask for a copy of your data, to have it corrected or deleted, to restrict or object to its use, and to complain to the data protection authority where you live (in Norway, Datatilsynet). To use these rights, contact us (see “Contact”). If you never signed in, we have no way to tell which data is yours.</p>"]),
 ("Changes", ["<p>If this policy changes, the new version will be published on this page with an updated date.</p>"]),
-("Contact", ["<p>Questions or requests? <a href=\""+ISSUES+"\">Open an issue</a> on GitHub. Issues are public, so do not put your email address or other personal details in them."+private_contact("For a privacy request you would rather not make in public, email {}.")+"</p>"]),
+("Contact", ["<p>Questions or requests? <a href=\""+ISSUES+"\">Open an issue</a> on GitHub. Issues are public, so do not put your email address or other personal details in them."+private_contact("For a privacy request you would rather not make in public, email {}.", "en")+"</p>"]),
 ], home="Choose your language")
 
 T["ru"] = dict(app="Срокоед", title="Политика конфиденциальности", upd="Последнее обновление: 13 ноября 2026 г.", secs=[
@@ -159,7 +176,7 @@ T["ru"] = dict(app="Срокоед", title="Политика конфиденц�
 ("Ваш контроль и ваши права", ["<p>Любой продукт можно изменить или удалить прямо в приложении. При удалении приложения его данные удаляются с вашего устройства. Если вы покупали рецепты, вы можете удалить аккаунт, как описано в разделе «Удаление аккаунта».</p>",
   "<p>Вы вправе запросить копию своих данных, потребовать их исправить или удалить, ограничить их использование или возразить против него, а также подать жалобу в орган по защите данных по месту жительства (в Норвегии — Datatilsynet). Чтобы воспользоваться этими правами, свяжитесь с нами (см. «Контакты»). Если вы ни разу не входили в аккаунт, мы не можем понять, какие данные ваши.</p>"]),
 ("Изменения", ["<p>Если политика изменится, новая версия будет опубликована на этой странице с обновлённой датой.</p>"]),
-("Контакты", ["<p>Есть вопросы или запросы? <a href=\""+ISSUES+"\">Создайте обращение (issue)</a> на GitHub. Обращения публичны, поэтому не указывайте в них адрес электронной почты и другие личные данные."+private_contact("Если вы не хотите отправлять запрос о персональных данных публично, напишите на {}.")+"</p>"]),
+("Контакты", ["<p>Есть вопросы или запросы? <a href=\""+ISSUES+"\">Создайте обращение (issue)</a> на GitHub. Обращения публичны, поэтому не указывайте в них адрес электронной почты и другие личные данные."+private_contact("Если вы не хотите отправлять запрос о персональных данных публично, напишите на {}.", "ru")+"</p>"]),
 ], home="Выберите язык")
 
 T["nb"] = dict(app="Matvakt", title="Personvernerklæring", upd="Sist oppdatert: 13. november 2026", secs=[
@@ -225,7 +242,7 @@ T["nb"] = dict(app="Matvakt", title="Personvernerklæring", upd="Sist oppdatert:
 ("Din kontroll og dine rettigheter", ["<p>Du kan endre eller slette alle matvarer i appen. Avinstallerer du appen, slettes dataene fra enheten din. Har du kjøpt oppskrifter, kan du slette kontoen din som beskrevet under «Slette kontoen».</p>",
   "<p>Du har rett til å be om en kopi av dataene dine, få dem rettet eller slettet, begrense eller protestere mot bruken av dem, og klage til datatilsynsmyndigheten der du bor (i Norge: Datatilsynet). For å bruke disse rettighetene, kontakt oss (se «Kontakt»). Hvis du aldri har logget inn, har vi ingen måte å vite hvilke data som er dine.</p>"]),
 ("Endringer", ["<p>Hvis erklæringen endres, publiseres den nye versjonen på denne siden med oppdatert dato.</p>"]),
-("Kontakt", ["<p>Spørsmål eller forespørsler? <a href=\""+ISSUES+"\">Opprett en sak (issue)</a> på GitHub. Saker er offentlige, så ikke skriv e-postadressen din eller andre personopplysninger i dem."+private_contact("Hvis du ikke vil sende en forespørsel om personvern offentlig, send e-post til {}.")+"</p>"]),
+("Kontakt", ["<p>Spørsmål eller forespørsler? <a href=\""+ISSUES+"\">Opprett en sak (issue)</a> på GitHub. Saker er offentlige, så ikke skriv e-postadressen din eller andre personopplysninger i dem."+private_contact("Hvis du ikke vil sende en forespørsel om personvern offentlig, send e-post til {}.", "nb")+"</p>"]),
 ], home="Velg språk")
 
 def page(code):
