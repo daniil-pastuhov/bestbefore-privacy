@@ -273,7 +273,7 @@ open("index.html","w",encoding="utf-8").write(f"""<!doctype html>
 <title>BestBefore — Privacy Policy</title><style>{CSS}</style></head>
 <body><main><h1>BestBefore</h1><p class="mut">Privacy Policy · Personvernerklæring · Политика конфиденциальности</p>
 <div class="langs"><a href="en.html" hreflang="en">English — BestBefore</a><a href="ru.html" hreflang="ru">Русский — Срокоед</a><a href="nb.html" hreflang="nb">Norsk — Matvakt</a></div></main></body></html>""")
-open("README.md","w").write("# BestBefore privacy policy\n\nStatic pages served by GitHub Pages: English, Russian (Срокоед) and Norwegian (Matvakt).\n\nSource of truth for the policy text is `build.py`; run `python3 build.py` to regenerate the HTML.\n")
+open("README.md","w").write("# BestBefore privacy policy\n\nStatic pages served by GitHub Pages: English, Russian (Срокоед) and Norwegian (Matvakt), plus `app.html`, a short page about the app with screenshots from `img/`.\n\nSource of truth for the policy text is `build.py`; run `python3 build.py` to regenerate the HTML.\n")
 open(".nojekyll","w").write("")
 
 # --- Support page (the App Store's required Support URL) -------------------------------------
@@ -405,4 +405,84 @@ open("delete.html", "w", encoding="utf-8").write(f"""<!doctype html>
 s = open("index.html", encoding="utf-8").read()
 if "delete.html" not in s:
     s = s.replace('</main></body>', '<p><a href="delete.html">Delete your account and data · Удаление аккаунта и данных · Slett kontoen og dataene dine</a></p></main></body>')
+    open("index.html", "w", encoding="utf-8").write(s)
+
+# --- About page: what the app is, with screenshots and store links ---------------------------
+# The index stays the privacy policy's language chooser (the stores link to it); this page is
+# linked from it. Screenshots in img/ are 360 px wide JPEG copies of the App Store screenshots
+# (FoodTrack repo, store-listing/app-store/<locale>/screenshots/1-4.png).
+APP_STORE = "https://apps.apple.com/app/id6818647200"
+SOURCE = "https://github.com/daniil-pastuhov/FoodTrack"
+APP_CSS = """.lead{font-size:1.1rem}.shots{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:24px 0}
+@media(min-width:640px){.shots{grid-template-columns:repeat(4,1fr)}}
+.shots img{width:100%;height:auto;display:block;border-radius:10px;border:1px solid var(--bd)}
+.btn{display:inline-block;padding:10px 18px;border-radius:10px;background:var(--ac);color:var(--bg);font-weight:600;text-decoration:none}
+.get p{margin:.8em 0}hr{border:0;border-top:1px solid var(--bd);margin:40px 0}"""
+ABOUT = [
+ ("en", "BestBefore", "An expiry date tracker for your fridge, freezer and cupboard", [
+  "Know what's about to expire", "Scan the pack, the date is read", "Cook what needs using first", "A three-day menu around what you have"],
+  "<p class=\"lead\">Scan a barcode and the product is filled in from Open Food Facts; point the camera at the printed date and the phone reads it. Your food is sorted by where you keep it, a reminder comes before something expires, essentials you use up go onto the shopping list, and the Recipe tab turns what is about to expire into a recipe or a three-day menu. Home Screen widgets show what to use first.</p>",
+  [("Free, private, open source", L(
+    "Free, with no ads and no subscription. No account needed.",
+    "Your pantry stays on your phone. Export a backup whenever you like.",
+    "No tracking. The app sends crash reports, and barcodes are looked up on Open Food Facts.",
+    f'Open source (Apache-2.0): <a href="{SOURCE}">the source code is on GitHub</a>.',
+    "In English, Russian and Norwegian.")),
+   ("Recipes from what is about to expire", L(
+    "Free: share a ready-made prompt to the AI app you already use.",
+    "Free on the phone itself, where the phone supports it: Apple Intelligence on iPhone (iOS 26 or later), Gemini Nano on some Android phones.",
+    "Optional recipe packs, bought once in the app (no subscription): recipes written by our server, and the three-day menu. A recipe from a pack sends the items you tick, your recipe settings and your allergens to our server. The free ways send nothing to us.")),
+   ("Get it", f'<div class="get"><p><a class="btn" href="{APP_STORE}">Download on the App Store</a> <span class="mut">iPhone and iPad</span></p><p><b>Android:</b> Google Play, in closed testing, not public yet.</p></div>')],
+  ("Privacy policy", "Support", "Delete your account and data", "Source code")),
+ ("ru", "Срокоед", "Сроки годности продуктов в холодильнике, морозилке и кладовой", [
+  "Видно, что скоро испортится", "Наведите камеру — срок распознан", "Готовьте из того, что пора съесть", "Меню на три дня под ваши продукты"],
+  "<p class=\"lead\">Отсканируйте штрихкод — название продукта подставится из Open Food Facts; наведите камеру на напечатанную дату — телефон сам её распознает. Продукты разложены по местам хранения, напоминание приходит до того, как срок истечёт, закончившиеся важные продукты попадают в список покупок, а вкладка «Рецепт» превращает то, что скоро испортится, в рецепт или меню на три дня. Виджеты на экране «Домой» показывают, что съесть в первую очередь.</p>",
+  [("Бесплатно, приватно, с открытым кодом", L(
+    "Бесплатно, без рекламы и без подписки. Аккаунт не нужен.",
+    "Ваши продукты хранятся на телефоне. Резервную копию можно сохранить в любой момент.",
+    "Без слежки. Приложение отправляет отчёты о сбоях, а штрихкоды ищет в Open Food Facts.",
+    f'Открытый код (Apache-2.0): <a href="{SOURCE}">исходный код на GitHub</a>.',
+    "На русском, английском и норвежском.")),
+   ("Рецепты из того, что скоро испортится", L(
+    "Бесплатно: отправьте готовый запрос в ИИ-приложение, которым уже пользуетесь.",
+    "Бесплатно на самом телефоне, если он это поддерживает: Apple Intelligence на iPhone (iOS 26 и новее), Gemini Nano на некоторых телефонах Android.",
+    "По желанию — пакеты рецептов, разовая покупка в приложении (без подписки): рецепты с нашего сервера и меню на три дня. Для рецепта из пакета приложение отправляет на сервер отмеченные продукты, настройки рецепта и аллергены. Бесплатные способы нам ничего не отправляют.")),
+   ("Где скачать", f'<div class="get"><p><a class="btn" href="{APP_STORE}">Загрузить в App Store</a> <span class="mut">iPhone и iPad</span></p><p><b>Android:</b> Google Play, идёт закрытое тестирование, в открытом доступе приложения пока нет.</p></div>')],
+  ("Политика конфиденциальности", "Поддержка", "Удаление аккаунта и данных", "Исходный код")),
+ ("nb", "Matvakt", "Holdbarhet på maten i kjøleskapet, fryseren og matskapet", [
+  "Se hva som snart går ut", "Skann pakken, datoen leses av", "Lag mat av det som må brukes først", "Meny for tre dager rundt det du har"],
+  "<p class=\"lead\">Skann strekkoden, så fylles varen ut fra Open Food Facts; rett kameraet mot den påtrykte datoen, så leser telefonen den. Maten sorteres etter hvor du oppbevarer den, du får en påminnelse før noe går ut på dato, faste varer du bruker opp havner på handlelisten, og Oppskrift-fanen gjør det som snart går ut om til en oppskrift eller en meny for tre dager. Widgeter på Hjem-skjermen viser hva du bør bruke først.</p>",
+  [("Gratis, privat og åpen kildekode", L(
+    "Gratis, uten reklame og uten abonnement. Ingen konto nødvendig.",
+    "Matvarene dine blir på telefonen. Ta sikkerhetskopi når du vil.",
+    "Ingen sporing. Appen sender krasjrapporter, og strekkoder slås opp i Open Food Facts.",
+    f'Åpen kildekode (Apache-2.0): <a href="{SOURCE}">kildekoden ligger på GitHub</a>.',
+    "På norsk, engelsk og russisk.")),
+   ("Oppskrifter av det som snart går ut", L(
+    "Gratis: del en ferdig ledetekst med KI-appen du allerede bruker.",
+    "Gratis på selve telefonen, der telefonen støtter det: Apple Intelligence på iPhone (iOS 26 eller nyere), Gemini Nano på noen Android-telefoner.",
+    "Valgfrie oppskriftspakker, engangskjøp i appen (ikke abonnement): oppskrifter skrevet av serveren vår, og menyen for tre dager. En oppskrift fra en pakke sender varene du krysser av, oppskriftsinnstillingene og allergenene dine til serveren vår. De gratis alternativene sender ingenting til oss.")),
+   ("Last ned", f'<div class="get"><p><a class="btn" href="{APP_STORE}">Last ned i App Store</a> <span class="mut">iPhone og iPad</span></p><p><b>Android:</b> Google Play, i lukket testing, ikke offentlig ennå.</p></div>')],
+  ("Personvernerklæring", "Brukerstøtte", "Slett kontoen og dataene dine", "Kildekode")),
+]
+body = '<nav>' + " ".join(f'<a href="#{c}">{n}</a>' for c, n in NAV) + '</nav>'
+for n, (code, name, sub, alts, lead, secs, links) in enumerate(ABOUT):
+    lazy = '' if n == 0 else ' loading="lazy"'
+    shots = '<div class="shots">' + "".join(
+        f'<img src="img/{code}-{i}.jpg" width="360" height="782" alt="{html.escape(a)}"{lazy}>' for i, a in enumerate(alts, 1)) + '</div>'
+    policy, support, delete, source = links
+    body += (f'<section id="{code}" lang="{code}"><h1>{name}</h1><p class="mut">{sub}</p>{lead}{shots}'
+             + "".join(f"<h2>{h}</h2>{p}" for h, p in secs)
+             + f'<p class="mut"><a href="{code}.html">{policy}</a> · <a href="support.html#{code}">{support}</a> · '
+               f'<a href="delete.html#{code}">{delete}</a> · <a href="{SOURCE}">{source}</a></p></section><hr>')
+open("app.html", "w", encoding="utf-8").write(f"""<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BestBefore — Expiry date tracker for iPhone and Android</title>
+<meta name="description" content="BestBefore (Срокоед, Matvakt): a free, open-source expiry date tracker. Scan groceries, get a reminder before food goes off, and cook what is about to expire. No account, no ads.">
+<meta name="robots" content="index,follow"><style>{CSS}
+{APP_CSS}</style></head>
+<body><main>{body}<p class="mut"><a href="index.html">Privacy Policy</a> · <a href="support.html">Support</a></p></main></body></html>""")
+s = open("index.html", encoding="utf-8").read()
+if "app.html" not in s:
+    s = s.replace('<div class="langs">', '<p><a href="app.html">About the app · О приложении · Om appen</a></p><div class="langs">', 1)
     open("index.html", "w", encoding="utf-8").write(s)
