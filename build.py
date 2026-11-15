@@ -417,7 +417,7 @@ APP_CSS = """.lead{font-size:1.1rem}.shots{display:grid;grid-template-columns:re
 @media(min-width:640px){.shots{grid-template-columns:repeat(4,1fr)}}
 .shots img{width:100%;height:auto;display:block;border-radius:10px;border:1px solid var(--bd)}
 .btn{display:inline-block;padding:10px 18px;border-radius:10px;background:var(--ac);color:var(--bg);font-weight:600;text-decoration:none}
-.get p{margin:.8em 0}hr{border:0;border-top:1px solid var(--bd);margin:40px 0}"""
+.get p{margin:.8em 0}.get .mut{white-space:nowrap}hr{border:0;border-top:1px solid var(--bd);margin:40px 0}"""
 ABOUT = [
  ("en", "BestBefore", "An expiry date tracker for your fridge, freezer and cupboard", [
   "Know what's about to expire", "Scan the pack, the date is read", "Cook what needs using first", "A three-day menu around what you have"],
@@ -465,20 +465,32 @@ ABOUT = [
    ("Last ned", f'<div class="get"><p><a class="btn" href="{APP_STORE}">Last ned i App Store</a> <span class="mut">iPhone og iPad</span></p><p><b>Android:</b> Google Play, i lukket testing, ikke offentlig ennå.</p></div>')],
   ("Personvernerklæring", "Brukerstøtte", "Slett kontoen og dataene dine", "Kildekode")),
 ]
-body = '<nav>' + " ".join(f'<a href="#{c}">{n}</a>' for c, n in NAV) + '</nav>'
+def app_nav(cur):
+    return '<nav>' + " ".join(f'<a href="#{c}" hreflang="{c}"' + (' aria-current="page"' if c == cur else '') + f'>{n}</a>' for c, n in NAV) + '</nav>'
+body = ''
 for n, (code, name, sub, alts, lead, secs, links) in enumerate(ABOUT):
     lazy = '' if n == 0 else ' loading="lazy"'
     shots = '<div class="shots">' + "".join(
         f'<img src="img/{code}-{i}.jpg" width="360" height="782" alt="{html.escape(a)}"{lazy}>' for i, a in enumerate(alts, 1)) + '</div>'
     policy, support, delete, source = links
-    body += (f'<section id="{code}" lang="{code}"><h1>{name}</h1><p class="mut">{sub}</p>{lead}{shots}'
+    body += (f'<section id="{code}" lang="{code}">{app_nav(code)}<h1>{name}</h1><p class="mut">{sub}</p>{lead}{shots}'
              + "".join(f"<h2>{h}</h2>{p}" for h, p in secs)
              + f'<p class="mut"><a href="{code}.html">{policy}</a> · <a href="support.html#{code}">{support}</a> · '
                f'<a href="delete.html#{code}">{delete}</a> · <a href="{SOURCE}">{source}</a></p></section><hr>')
+SITE = "https://daniil-pastuhov.github.io/bestbefore-privacy/"
+# Android is in closed testing, not public on Google Play, so the title names only the iPhone.
+APP_TITLE = "BestBefore — Expiry date tracker for iPhone"
+APP_DESC = "BestBefore (Срокоед, Matvakt): a free, open-source expiry date tracker. Scan groceries, get a reminder before food goes off, and cook what is about to expire. No account, no ads."
 open("app.html", "w", encoding="utf-8").write(f"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>BestBefore — Expiry date tracker for iPhone and Android</title>
-<meta name="description" content="BestBefore (Срокоед, Matvakt): a free, open-source expiry date tracker. Scan groceries, get a reminder before food goes off, and cook what is about to expire. No account, no ads.">
+<title>{APP_TITLE}</title>
+<meta name="description" content="{APP_DESC}">
+<link rel="canonical" href="{SITE}app.html">
+<meta property="og:type" content="website"><meta property="og:site_name" content="BestBefore">
+<meta property="og:title" content="{APP_TITLE}"><meta property="og:description" content="{APP_DESC}">
+<meta property="og:url" content="{SITE}app.html"><meta property="og:image" content="{SITE}img/en-1.jpg">
+<meta property="og:image:width" content="360"><meta property="og:image:height" content="782">
+<meta property="og:image:alt" content="{html.escape(ABOUT[0][3][0])}"><meta name="twitter:card" content="summary">
 <meta name="robots" content="index,follow"><style>{CSS}
 {APP_CSS}</style></head>
 <body><main>{body}<p class="mut"><a href="index.html">Privacy Policy</a> · <a href="support.html">Support</a></p></main></body></html>""")
