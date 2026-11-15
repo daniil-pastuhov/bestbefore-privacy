@@ -12,11 +12,15 @@ h2{font-size:1.2rem;margin:2em 0 .4em}p,li{margin:.5em 0}ul{padding-left:1.2em}a
 nav{display:flex;gap:14px;flex-wrap:wrap;font-size:.95rem}nav a[aria-current]{font-weight:700;text-decoration:none;color:var(--fg)}
 .langs a{display:block;padding:14px 18px;margin:10px 0;border:1px solid var(--bd);border-radius:12px;background:var(--card);text-decoration:none;font-weight:600}"""
 
+# Icons from the app icon (FoodTrack repo, store-listing/google-play/icon-512.png), on every page.
+ICONS = '<link rel="icon" href="favicon.ico" sizes="16x16 32x32 48x48"><link rel="icon" type="image/png" sizes="32x32" href="img/icon-32.png"><link rel="apple-touch-icon" href="img/apple-touch-icon.png">'
 NAV = [("en","English"),("ru","Русский"),("nb","Norsk")]
 def nav(cur):
     return "<nav>"+" ".join(f'<a href="{c}.html" hreflang="{c}"'+(' aria-current="page"' if c==cur else '')+f'>{n}</a>' for c,n in NAV)+"</nav>"
 
-VERTEX = "https://cloud.google.com/vertex-ai/generative-ai/docs/data-governance"
+# Google renamed Vertex AI to Gemini Enterprise Agent Platform; the old data governance page
+# (cloud.google.com/vertex-ai/generative-ai/docs/data-governance) now redirects here.
+VERTEX = "https://docs.cloud.google.com/gemini-enterprise-agent-platform/resources/zero-data-retention"
 # Email address for privacy requests made privately, kept as character codes (user part and domain
 # separately) so that neither this file nor the generated pages contain a harvestable address.
 # Both lists are empty until the owner confirms the address; while empty, the Contact sentence is
@@ -265,11 +269,13 @@ def page(code):
     body="".join(f"<h2>{h}</h2>{''.join(ps)}" for h,ps in t["secs"])
     return f"""<!doctype html>
 <html lang="{code}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+{ICONS}
 <title>{t['app']} — {t['title']}</title><meta name="robots" content="index,follow"><style>{CSS}</style></head>
 <body><main>{nav(code)}<h1>{t['app']}<br>{t['title']}</h1><p class="mut">{t['upd']}</p><div class="card">{''.join(t['secs'][0][1])}</div>{body.split('</p>',1)[1] if False else ''.join(f"<h2>{h}</h2>{''.join(ps)}" for h,ps in t['secs'][1:])}</main></body></html>"""
 for c in T: open(f"{c}.html","w",encoding="utf-8").write(page(c))
 open("index.html","w",encoding="utf-8").write(f"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+{ICONS}
 <title>BestBefore — Privacy Policy</title><style>{CSS}</style></head>
 <body><main><h1>BestBefore</h1><p class="mut">Privacy Policy · Personvernerklæring · Политика конфиденциальности</p>
 <div class="langs"><a href="en.html" hreflang="en">English — BestBefore</a><a href="ru.html" hreflang="ru">Русский — Срокоед</a><a href="nb.html" hreflang="nb">Norsk — Matvakt</a></div></main></body></html>""")
@@ -319,6 +325,7 @@ for code, title, secs in SUPPORT:
     body += f'<section id="{code}" lang="{code}"><h1>{title}</h1>' + "".join(f"<h2>{h}</h2>{p}" for h, p in secs) + "</section><hr>"
 open("support.html", "w", encoding="utf-8").write(f"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+{ICONS}
 <title>BestBefore — Support</title><style>{CSS} hr{{border:0;border-top:1px solid var(--bd);margin:40px 0}}</style></head>
 <body><main>{body}<p class="mut"><a href="index.html">Privacy Policy</a></p></main></body></html>""")
 s = open("index.html", encoding="utf-8").read()
@@ -400,6 +407,7 @@ for code, title, policy, secs in DELETE:
     body += f'<section id="{code}" lang="{code}"><h1>{title}</h1>' + "".join((f"<h2>{h}</h2>" if h else "") + p for h, p in secs) + f'<p class="mut"><a href="{code}.html">{policy}</a></p></section><hr>'
 open("delete.html", "w", encoding="utf-8").write(f"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+{ICONS}
 <title>BestBefore — Delete your account and data</title><meta name="robots" content="index,follow"><style>{CSS} hr{{border:0;border-top:1px solid var(--bd);margin:40px 0}}</style></head>
 <body><main>{body}<p class="mut"><a href="index.html">BestBefore</a> · <a href="support.html">Support</a></p></main></body></html>""")
 s = open("index.html", encoding="utf-8").read()
@@ -417,11 +425,14 @@ APP_CSS = """.lead{font-size:1.1rem}.shots{display:grid;grid-template-columns:re
 @media(min-width:640px){.shots{grid-template-columns:repeat(4,1fr)}}
 .shots img{width:100%;height:auto;display:block;border-radius:10px;border:1px solid var(--bd)}
 .btn{display:inline-block;padding:10px 18px;border-radius:10px;background:var(--ac);color:var(--bg);font-weight:600;text-decoration:none}
+h2.name{font-size:1.9rem;line-height:1.2;margin:.2em 0}h3{font-size:1.2rem;margin:2em 0 .4em}
+.vh{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 .get p{margin:.8em 0}.get .mut{white-space:nowrap}hr{border:0;border-top:1px solid var(--bd);margin:40px 0}"""
 ABOUT = [
  ("en", "BestBefore", "An expiry date tracker for your fridge, freezer and cupboard", [
-  "Know what's about to expire", "Scan the pack, the date is read", "Cook what needs using first", "A three-day menu around what you have"],
-  "<p class=\"lead\">Scan a barcode and the product is filled in from Open Food Facts; point the camera at the printed date and the phone reads it. Your food is sorted by where you keep it, a reminder comes before something expires, essentials you use up go onto the shopping list, and the Recipe tab turns what is about to expire into a recipe or a three-day menu. Home Screen widgets show what to use first.</p>",
+  "Know what's about to expire", "Scan the pack, the date is read", "Cook what needs using first", "A three-day menu around what you have (with a recipe pack)"],
+  "The three-day menu (last picture) needs a recipe pack: an optional one-off purchase, no subscription.",
+  "<p class=\"lead\">Scan a barcode and the product is filled in from Open Food Facts; point the camera at the printed date and the phone reads it. Your food is sorted by where you keep it, a reminder comes before something expires, essentials you use up go onto the shopping list, and the Recipe tab turns what is about to expire into a recipe or, with a recipe pack, a three-day menu. Home Screen widgets show what to use first.</p>",
   [("Free, private, open source", L(
     "Free, with no ads and no subscription. No account needed.",
     "Your pantry stays on your phone. Export a backup whenever you like.",
@@ -430,13 +441,14 @@ ABOUT = [
     "In English, Russian and Norwegian.")),
    ("Recipes from what is about to expire", L(
     "Free: share a ready-made prompt to the AI app you already use.",
-    "Free on the phone itself, where the phone supports it: Apple Intelligence on iPhone (iOS 26 or later), Gemini Nano on some Android phones.",
+    "Free on the device itself, where it supports it: Apple Intelligence on iPhone and iPad (iOS or iPadOS 26 or later), Gemini Nano on some Android phones.",
     "Optional recipe packs, bought once in the app (no subscription): recipes written by our server, and the three-day menu. A recipe from a pack sends the items you tick, your recipe settings and your allergens to our server. The free ways send nothing to us.")),
    ("Get it", f'<div class="get"><p><a class="btn" href="{APP_STORE}">Download on the App Store</a> <span class="mut">iPhone and iPad</span></p><p><b>Android:</b> Google Play, in closed testing, not public yet.</p></div>')],
   ("Privacy policy", "Support", "Delete your account and data", "Source code")),
  ("ru", "Срокоед", "Сроки годности продуктов в холодильнике, морозилке и кладовой", [
-  "Видно, что скоро испортится", "Наведите камеру — срок распознан", "Готовьте из того, что пора съесть", "Меню на три дня под ваши продукты"],
-  "<p class=\"lead\">Отсканируйте штрихкод — название продукта подставится из Open Food Facts; наведите камеру на напечатанную дату — телефон сам её распознает. Продукты разложены по местам хранения, напоминание приходит до того, как срок истечёт, закончившиеся важные продукты попадают в список покупок, а вкладка «Рецепт» превращает то, что скоро испортится, в рецепт или меню на три дня. Виджеты на экране «Домой» показывают, что съесть в первую очередь.</p>",
+  "Видно, что скоро испортится", "Наведите камеру — срок распознан", "Готовьте из того, что пора съесть", "Меню на три дня под ваши продукты (с пакетом рецептов)"],
+  "Для меню на три дня (последний снимок экрана) нужен пакет рецептов — разовая покупка по желанию, без подписки.",
+  "<p class=\"lead\">Отсканируйте штрихкод — название продукта подставится из Open Food Facts; наведите камеру на напечатанную дату — телефон сам её распознает. Продукты разложены по местам хранения, напоминание приходит до того, как срок истечёт, закончившиеся важные продукты попадают в список покупок, а вкладка «Рецепт» превращает то, что скоро испортится, в рецепт или — с пакетом рецептов — в меню на три дня. Виджеты на экране «Домой» показывают, что съесть в первую очередь.</p>",
   [("Бесплатно, приватно, с открытым кодом", L(
     "Бесплатно, без рекламы и без подписки. Аккаунт не нужен.",
     "Ваши продукты хранятся на телефоне. Резервную копию можно сохранить в любой момент.",
@@ -445,13 +457,14 @@ ABOUT = [
     "На русском, английском и норвежском.")),
    ("Рецепты из того, что скоро испортится", L(
     "Бесплатно: отправьте готовый запрос в ИИ-приложение, которым уже пользуетесь.",
-    "Бесплатно на самом телефоне, если он это поддерживает: Apple Intelligence на iPhone (iOS 26 и новее), Gemini Nano на некоторых телефонах Android.",
+    "Бесплатно на самом устройстве, если оно это поддерживает: Apple Intelligence на iPhone и iPad (iOS или iPadOS 26 и новее), Gemini Nano на некоторых телефонах Android.",
     "По желанию — пакеты рецептов, разовая покупка в приложении (без подписки): рецепты с нашего сервера и меню на три дня. Для рецепта из пакета приложение отправляет на сервер отмеченные продукты, настройки рецепта и аллергены. Бесплатные способы нам ничего не отправляют.")),
    ("Где скачать", f'<div class="get"><p><a class="btn" href="{APP_STORE}">Загрузить в App Store</a> <span class="mut">iPhone и iPad</span></p><p><b>Android:</b> Google Play, идёт закрытое тестирование, в открытом доступе приложения пока нет.</p></div>')],
   ("Политика конфиденциальности", "Поддержка", "Удаление аккаунта и данных", "Исходный код")),
  ("nb", "Matvakt", "Holdbarhet på maten i kjøleskapet, fryseren og matskapet", [
-  "Se hva som snart går ut", "Skann pakken, datoen leses av", "Lag mat av det som må brukes først", "Meny for tre dager rundt det du har"],
-  "<p class=\"lead\">Skann strekkoden, så fylles varen ut fra Open Food Facts; rett kameraet mot den påtrykte datoen, så leser telefonen den. Maten sorteres etter hvor du oppbevarer den, du får en påminnelse før noe går ut på dato, faste varer du bruker opp havner på handlelisten, og Oppskrift-fanen gjør det som snart går ut om til en oppskrift eller en meny for tre dager. Widgeter på Hjem-skjermen viser hva du bør bruke først.</p>",
+  "Se hva som snart går ut", "Skann pakken, datoen leses av", "Lag mat av det som må brukes først", "Meny for tre dager rundt det du har (med oppskriftspakke)"],
+  "Menyen for tre dager (siste skjermbilde) krever en oppskriftspakke – et valgfritt engangskjøp, ikke abonnement.",
+  "<p class=\"lead\">Skann strekkoden, så fylles varen ut fra Open Food Facts; rett kameraet mot den påtrykte datoen, så leser telefonen den. Maten sorteres etter hvor du oppbevarer den, du får en påminnelse før noe går ut på dato, faste varer du bruker opp havner på handlelisten, og Oppskrift-fanen gjør det som snart går ut om til en oppskrift eller, med en oppskriftspakke, en meny for tre dager. Widgeter på Hjem-skjermen viser hva du bør bruke først.</p>",
   [("Gratis, privat og åpen kildekode", L(
     "Gratis, uten reklame og uten abonnement. Ingen konto nødvendig.",
     "Matvarene dine blir på telefonen. Ta sikkerhetskopi når du vil.",
@@ -460,7 +473,7 @@ ABOUT = [
     "På norsk, engelsk og russisk.")),
    ("Oppskrifter av det som snart går ut", L(
     "Gratis: del en ferdig ledetekst med KI-appen du allerede bruker.",
-    "Gratis på selve telefonen, der telefonen støtter det: Apple Intelligence på iPhone (iOS 26 eller nyere), Gemini Nano på noen Android-telefoner.",
+    "Gratis på selve enheten, der den støtter det: Apple Intelligence på iPhone og iPad (iOS eller iPadOS 26 eller nyere), Gemini Nano på noen Android-telefoner.",
     "Valgfrie oppskriftspakker, engangskjøp i appen (ikke abonnement): oppskrifter skrevet av serveren vår, og menyen for tre dager. En oppskrift fra en pakke sender varene du krysser av, oppskriftsinnstillingene og allergenene dine til serveren vår. De gratis alternativene sender ingenting til oss.")),
    ("Last ned", f'<div class="get"><p><a class="btn" href="{APP_STORE}">Last ned i App Store</a> <span class="mut">iPhone og iPad</span></p><p><b>Android:</b> Google Play, i lukket testing, ikke offentlig ennå.</p></div>')],
   ("Personvernerklæring", "Brukerstøtte", "Slett kontoen og dataene dine", "Kildekode")),
@@ -468,13 +481,13 @@ ABOUT = [
 def app_nav(cur):
     return '<nav>' + " ".join(f'<a href="#{c}" hreflang="{c}"' + (' aria-current="page"' if c == cur else '') + f'>{n}</a>' for c, n in NAV) + '</nav>'
 body = ''
-for n, (code, name, sub, alts, lead, secs, links) in enumerate(ABOUT):
+for n, (code, name, sub, alts, shots_note, lead, secs, links) in enumerate(ABOUT):
     lazy = '' if n == 0 else ' loading="lazy"'
     shots = '<div class="shots">' + "".join(
-        f'<img src="img/{code}-{i}.jpg" width="360" height="782" alt="{html.escape(a)}"{lazy}>' for i, a in enumerate(alts, 1)) + '</div>'
+        f'<img src="img/{code}-{i}.jpg" width="360" height="782" alt="{html.escape(a)}"{lazy}>' for i, a in enumerate(alts, 1)) + f'</div><p class="mut">{shots_note}</p>'
     policy, support, delete, source = links
-    body += (f'<section id="{code}" lang="{code}">{app_nav(code)}<h1>{name}</h1><p class="mut">{sub}</p>{lead}{shots}'
-             + "".join(f"<h2>{h}</h2>{p}" for h, p in secs)
+    body += (f'<section id="{code}" lang="{code}">{app_nav(code)}<h2 class="name">{name}</h2><p class="mut">{sub}</p>{lead}{shots}'
+             + "".join(f"<h3>{h}</h3>{p}" for h, p in secs)
              + f'<p class="mut"><a href="{code}.html">{policy}</a> · <a href="support.html#{code}">{support}</a> · '
                f'<a href="delete.html#{code}">{delete}</a> · <a href="{SOURCE}">{source}</a></p></section><hr>')
 SITE = "https://daniil-pastuhov.github.io/bestbefore-privacy/"
@@ -483,6 +496,7 @@ APP_TITLE = "BestBefore — Expiry date tracker for iPhone"
 APP_DESC = "BestBefore (Срокоед, Matvakt): a free, open-source expiry date tracker. Scan groceries, get a reminder before food goes off, and cook what is about to expire. No account, no ads."
 open("app.html", "w", encoding="utf-8").write(f"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+{ICONS}
 <title>{APP_TITLE}</title>
 <meta name="description" content="{APP_DESC}">
 <link rel="canonical" href="{SITE}app.html">
@@ -493,7 +507,7 @@ open("app.html", "w", encoding="utf-8").write(f"""<!doctype html>
 <meta property="og:image:alt" content="{html.escape(ABOUT[0][3][0])}"><meta name="twitter:card" content="summary">
 <meta name="robots" content="index,follow"><style>{CSS}
 {APP_CSS}</style></head>
-<body><main>{body}<p class="mut"><a href="index.html">Privacy Policy</a> · <a href="support.html">Support</a></p></main></body></html>""")
+<body><main><h1 class="vh">BestBefore · <span lang="ru">Срокоед</span> · <span lang="nb">Matvakt</span></h1>{body}<p class="mut"><a href="index.html">Privacy Policy</a> · <a href="support.html">Support</a></p></main></body></html>""")
 s = open("index.html", encoding="utf-8").read()
 if "app.html" not in s:
     s = s.replace('<div class="langs">', '<p><a href="app.html">About the app · О приложении · Om appen</a></p><div class="langs">', 1)
