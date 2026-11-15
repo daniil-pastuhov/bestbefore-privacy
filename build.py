@@ -14,6 +14,13 @@ nav{display:flex;gap:14px;flex-wrap:wrap;font-size:.95rem}nav a[aria-current]{fo
 
 # Icons from the app icon (FoodTrack repo, store-listing/google-play/icon-512.png), on every page.
 ICONS = '<link rel="icon" href="favicon.ico" sizes="16x16 32x32 48x48"><link rel="icon" type="image/png" sizes="32x32" href="img/icon-32.png"><link rel="apple-touch-icon" href="img/apple-touch-icon.png">'
+# Trilingual pages (about, support, delete): one <h1> for the page, hidden visually; each language's
+# title is an <h2 class="name"> that looks like an <h1>, and its sections are <h3> that look like <h2>.
+MULTI_CSS = """h2.name{font-size:1.9rem;line-height:1.2;margin:.2em 0}h3{font-size:1.2rem;margin:2em 0 .4em}
+.vh{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}"""
+def multi_h1(titles):
+    # titles: [(lang, text)], English first; the page's root is lang="en".
+    return '<h1 class="vh">' + " · ".join(html.escape(t) if c == "en" else f'<span lang="{c}">{html.escape(t)}</span>' for c, t in titles) + "</h1>"
 NAV = [("en","English"),("ru","Русский"),("nb","Norsk")]
 def nav(cur):
     return "<nav>"+" ".join(f'<a href="{c}.html" hreflang="{c}"'+(' aria-current="page"' if c==cur else '')+f'>{n}</a>' for c,n in NAV)+"</nav>"
@@ -51,7 +58,7 @@ def L(*items):
     return "<ul>"+"".join(f"<li>{i}</li>" for i in items)+"</ul>"
 
 T = {}
-T["en"] = dict(app="BestBefore", title="Privacy Policy", upd="Last updated: 14 November 2026", secs=[
+T["en"] = dict(app="BestBefore", title="Privacy Policy", upd="Last updated: 15 November 2026", secs=[
 ("The short version", ["<p>BestBefore keeps your pantry on your phone. You need no account, and there is no advertising and no analytics. Apart from crash reports (see “Crash reports”), we receive data only from people who buy recipes, and only once they start a purchase (see “Buying recipes”). If you do not buy recipes, nothing changes for you. We do not sell your personal data.</p>"]),
 ("Who is responsible", ["<p>The data controller is Daniil Pastuhov, Norway: the individual developer who publishes BestBefore and is responsible for the data described in this policy. To reach him, see “Contact”.</p>"]),
 ("What the app stores", ["<p>Your pantry items, expiry dates, shopping list, settings (including your allergen list and cooking preferences), product photos, saved recipes and any shop locations you save are stored only in the app's local database on your device. They are not sent to us. The one exception is a recipe request from our server, which you send yourself (with “Send all products” on, it includes your whole pantry); see “Recipes from our server”.</p>"]),
@@ -62,7 +69,7 @@ T["en"] = dict(app="BestBefore", title="Privacy Policy", upd="Last updated: 14 N
 ("Notifications, backups and sharing", ["<ul><li>Expiry reminders and digests are scheduled locally on your device.</li><li>Exporting a backup or sharing a shopping list or recipe idea only happens when you choose to, and goes where you send it.</li><li>Your phone's own backup (Google or iCloud) may include the app's data. That is controlled by your device settings, not by us.</li></ul>"]),
 ("Recipes", ["<p>The Recipe tab can suggest a recipe from the items you tick, in three ways:</p>", L(
   "<b>Share or copy a prompt (free).</b> The app writes a text and hands it to the app you choose, or copies it. We receive nothing. What happens next is up to that app and its own privacy policy.",
-  "<b>On this phone (free).</b> On supported phones, the phone's own model writes the recipe (Gemini Nano on Android, Apple Foundation Models on iPhone). Nothing is sent to us.",
+  "<b>On this phone (free).</b> On supported phones, the phone's own model writes the recipe (Gemini Nano on Android, Apple Foundation Models on iPhone and iPad). Nothing is sent to us.",
   "<b>From our server (paid).</b> You buy recipes in Google Play or the App Store, and our server writes each recipe or three-day menu."),
   "<p>If you turn on <b>Send all products</b> in Recipe settings, the rest of your pantry is also offered to the recipe, as items it may use besides the ones you ticked. It is off unless you turn it on. When it is on, the shared prompt lists those items too, and a recipe from our server sends them as described in “Recipes from our server”; the phone's own model still sends nothing anywhere. Turning it off stops this for later requests.</p>",
   "<p>The next six sections apply only if you start a purchase of recipes.</p>"]),
@@ -79,12 +86,12 @@ T["en"] = dict(app="BestBefore", title="Privacy Policy", upd="Last updated: 14 N
   "your cooking preferences: difficulty, level of detail, servings, time, meal, diet and language;",
   "the allergen list from Settings;",
   "today's date and a random request number."),
-  "<p>Our server passes the items (including any sent with “Send all products”), preferences, allergens and date to Google's Gemini model on Vertex AI, which writes the recipe. No name, email or device identifier is sent to the model. We use Vertex AI's “global” endpoint, so Google may process the request outside the EU/EEA. Google processes it as our service provider under its Google Cloud terms; see <a href=\""+VERTEX+"\">Google's Vertex AI data governance page</a>.</p>",
+  "<p>Our server passes the items (including any sent with “Send all products”), preferences, allergens and date to Google's Gemini model on Vertex AI, which writes the recipe. No name, email or device identifier is sent to the model. We use Vertex AI's “global” endpoint, so Google may process the request outside the EU/EEA. Google processes it as our service provider under its Google Cloud terms; see <a href=\""+VERTEX+"\">Google's Vertex AI data governance page (now titled “Gemini Enterprise Agent Platform and zero data retention”)</a>.</p>",
   "<p>Your allergen list can reveal something about your health, so we treat it as data concerning health. The app sends it to our server only with your explicit consent (GDPR Article 9(2)(a)): before your first recipe request to our server while allergens are set, a short step shows what is sent, why and to whom, and you agree or cancel. The app records your answer, with the date, on your phone. You can withdraw your consent at any time in Recipe → Recipe settings; our server then writes no recipes while allergens are set, because a recipe written without them could be unsafe (the free ways, the phone's own model and the shared prompt, still work and send nothing to us). The allergen list is used only to write the recipe and to check the answer, and it is not stored.</p>",
   "<p>Our server checks requests and answers automatically, to stop the model being misused: it refuses item or allergen names that do not look like food names, and answers that contain, for example, links, contact details, an allergen from your list or text that is not about cooking. A refused name or answer is not stored or logged. Our server counts refused attempts under your identifier for the current day and logs the rule that refused them with a scrambled (hashed) form of your identifier; after several in one day, recipe requests from your account are refused until the next day.</p>",
   "<p>We do not log or keep what you send, neither the items you ticked nor the rest of your pantry. Our server keeps only a fingerprint (a hash) of the request, so that a repeated request can be recognised and is not charged twice. The recipe or menu written back, which names the ingredients it uses, is kept on our server for 7 days, so that the app can still collect it if the connection is lost. Then it is deleted automatically (Google's automatic deletion usually runs within a day after that). The app saves the recipe on your phone, where it stays until you delete it.</p>"]),
 ("Technical data for buyers", [L(
-  "<b>App Check.</b> With each request to our server, the app proves that it is a genuine copy, through Firebase App Check: with Google Play Integrity on Android and Apple App Attest on iPhone. This starts only when you start a purchase.",
+  "<b>App Check.</b> With each request to our server, the app proves that it is a genuine copy, through Firebase App Check: with Google Play Integrity on Android and Apple App Attest on iPhone and iPad. This starts only when you start a purchase.",
   "<b>IP address.</b> Our server uses your IP address to limit how many requests one source can send in a minute. It counts requests per address for the current minute in memory only, and does not store the address. Google's infrastructure also records each request to our server, with its IP address, in our server's technical logs.",
   "<b>Usage counts.</b> For each recipe request, our server logs one line with a scrambled (hashed) form of your identifier, the kind of request, how much text the model read and wrote (tokens), the result and the estimated cost. The line never contains your items, allergens, the prompt or the recipe. Our server also keeps, under your identifier, the number of requests, refused attempts and the estimated cost in the current minute and day, to apply limits.",
   "<b>Daily totals.</b> Our server keeps daily totals for all users together (requests, recipes, estimated cost), with no user data.",
@@ -122,7 +129,7 @@ T["en"] = dict(app="BestBefore", title="Privacy Policy", upd="Last updated: 14 N
 ("Contact", ["<p>Questions or requests? <a href=\""+ISSUES+"\">Open an issue</a> on GitHub. Issues are public, so do not put your email address or other personal details in them."+private_contact("For a privacy request you would rather not make in public, email {}.", "en")+"</p>"]),
 ], home="Choose your language")
 
-T["ru"] = dict(app="Срокоед", title="Политика конфиденциальности", upd="Последнее обновление: 14 ноября 2026 г.", secs=[
+T["ru"] = dict(app="Срокоед", title="Политика конфиденциальности", upd="Последнее обновление: 15 ноября 2026 г.", secs=[
 ("Коротко", ["<p>Срокоед хранит ваши продукты на вашем телефоне. Аккаунт не нужен, рекламы и аналитики нет. Помимо отчётов о сбоях (см. «Отчёты о сбоях»), мы получаем данные только от тех, кто покупает рецепты, и только после того, как покупка начата (см. «Покупка рецептов»). Если вы не покупаете рецепты, для вас ничего не меняется. Мы не продаём ваши персональные данные.</p>"]),
 ("Кто отвечает за данные", ["<p>Оператор (контролёр) данных — Daniil Pastuhov, Норвегия: частный разработчик, который публикует Срокоед и отвечает за данные, описанные в этой политике. Как с ним связаться, см. «Контакты».</p>"]),
 ("Что хранит приложение", ["<p>Продукты, сроки годности, список покупок, настройки (включая список аллергенов и предпочтения в готовке), фотографии продуктов, сохранённые рецепты и сохранённые вами магазины хранятся только в локальной базе данных приложения на вашем устройстве. Они не отправляются нам. Единственное исключение — запрос рецепта с нашего сервера, который вы отправляете сами (если включено «Отправлять все продукты», в нём все ваши продукты); см. «Рецепты с нашего сервера».</p>"]),
@@ -133,7 +140,7 @@ T["ru"] = dict(app="Срокоед", title="Политика конфиденц�
 ("Уведомления, резервные копии и обмен", ["<ul><li>Напоминания о сроках и сводки планируются локально на вашем устройстве.</li><li>Экспорт резервной копии и отправка списка покупок или идеи рецепта происходят только по вашему действию и попадают туда, куда вы их отправите.</li><li>Резервная копия самого телефона (Google или iCloud) может включать данные приложения. Это определяется настройками устройства, а не нами.</li></ul>"]),
 ("Рецепты", ["<p>Во вкладке «Рецепт» можно получить рецепт из отмеченных продуктов тремя способами:</p>", L(
   "<b>Отправить или скопировать запрос (бесплатно).</b> Приложение составляет текст и передаёт его в выбранное вами приложение или копирует его. Мы ничего не получаем. Что будет дальше, зависит от того приложения и его политики конфиденциальности.",
-  "<b>На этом телефоне (бесплатно).</b> На поддерживаемых телефонах рецепт пишет собственная модель телефона (Gemini Nano на Android, Apple Foundation Models на iPhone). Нам ничего не отправляется.",
+  "<b>На этом телефоне (бесплатно).</b> На поддерживаемых телефонах рецепт пишет собственная модель телефона (Gemini Nano на Android, Apple Foundation Models на iPhone и iPad). Нам ничего не отправляется.",
   "<b>С нашего сервера (платно).</b> Вы покупаете рецепты в Google Play или App Store, и каждый рецепт или меню на три дня пишет наш сервер."),
   "<p>Если в «Настройках рецептов» включить <b>«Отправлять все продукты»</b>, рецепту предлагаются и остальные продукты из вашей кладовой — те, которые он может использовать помимо отмеченных. По умолчанию эта настройка выключена. Когда она включена, общий запрос перечисляет и эти продукты, а рецепт с нашего сервера отправляет их, как описано в разделе «Рецепты с нашего сервера»; собственная модель телефона по-прежнему ничего никуда не отправляет. Если выключить настройку, последующие запросы отправляются уже без них.</p>",
   "<p>Следующие шесть разделов касаются вас, только если вы начали покупку рецептов.</p>"]),
@@ -150,12 +157,12 @@ T["ru"] = dict(app="Срокоед", title="Политика конфиденц�
   "ваши предпочтения в готовке: сложность, подробность, число порций, время, приём пищи, диету и язык;",
   "список аллергенов из настроек;",
   "сегодняшнюю дату и случайный номер запроса."),
-  "<p>Наш сервер передаёт продукты (в том числе отправленные с настройкой «Отправлять все продукты»), предпочтения, аллергены и дату модели Google Gemini в Vertex AI, которая пишет рецепт. Имя, адрес электронной почты или идентификатор устройства модели не отправляются. Мы используем «глобальную» точку доступа Vertex AI (global), поэтому Google может обрабатывать запрос за пределами ЕС/ЕЭЗ. Google обрабатывает его как наш поставщик услуг по условиям Google Cloud; см. <a href=\""+VERTEX+"\">страницу Google об управлении данными в Vertex AI</a>.</p>",
+  "<p>Наш сервер передаёт продукты (в том числе отправленные с настройкой «Отправлять все продукты»), предпочтения, аллергены и дату модели Google Gemini в Vertex AI, которая пишет рецепт. Имя, адрес электронной почты или идентификатор устройства модели не отправляются. Мы используем «глобальную» точку доступа Vertex AI (global), поэтому Google может обрабатывать запрос за пределами ЕС/ЕЭЗ. Google обрабатывает его как наш поставщик услуг по условиям Google Cloud; см. <a href=\""+VERTEX+"\">страницу Google об управлении данными в Vertex AI (сейчас она называется «Gemini Enterprise Agent Platform and zero data retention»)</a>.</p>",
   "<p>Список аллергенов может кое-что сказать о вашем здоровье, поэтому мы относимся к нему как к данным о здоровье. Приложение отправляет его на наш сервер только с вашего явного согласия (статья 9(2)(a) GDPR): перед первым запросом рецепта к нашему серверу, когда заданы аллергены, короткий шаг показывает, что отправляется, зачем и кому, и вы соглашаетесь или отменяете. Приложение сохраняет ваш ответ с датой на телефоне. Отозвать согласие можно в любое время в разделе «Рецепт» → «Настройки рецептов»; тогда наш сервер не пишет рецепты, пока заданы аллергены, потому что рецепт без их учёта может быть небезопасным (бесплатные способы — собственная модель телефона и общий запрос — продолжают работать и ничего нам не отправляют). Список аллергенов используется только для того, чтобы написать рецепт и проверить ответ, и не хранится.</p>",
   "<p>Наш сервер автоматически проверяет запросы и ответы, чтобы модель нельзя было использовать не по назначению: он отклоняет названия продуктов или аллергенов, не похожие на названия продуктов, и ответы, в которых есть, например, ссылки, контактные данные, аллерген из вашего списка или текст не о готовке. Отклонённое название или ответ не хранится и не записывается в журналы. Наш сервер считает отклонённые попытки под вашим идентификатором за текущий день и записывает в журнал правило, по которому они отклонены, вместе с необратимо преобразованной (хешированной) формой вашего идентификатора; после нескольких таких попыток за день запросы рецептов от вашего аккаунта отклоняются до следующего дня.</p>",
   "<p>Мы не записываем в журналы и не храним то, что вы отправляете, — ни отмеченные продукты, ни остальные. Наш сервер хранит только отпечаток (хеш) запроса, чтобы повторный запрос можно было узнать и не списать за него дважды. Полученный рецепт или меню, где названы использованные продукты, хранится на нашем сервере 7 дней, чтобы приложение могло забрать его, если связь прервалась. Затем он удаляется автоматически (автоматическое удаление Google обычно происходит в течение суток после этого). Приложение сохраняет рецепт на вашем телефоне, где он остаётся, пока вы его не удалите.</p>"]),
 ("Технические данные покупателей", [L(
-  "<b>App Check.</b> При каждом запросе к нашему серверу приложение подтверждает, что это подлинная копия, через Firebase App Check: с помощью Google Play Integrity на Android и Apple App Attest на iPhone. Это начинается только тогда, когда вы начинаете покупку.",
+  "<b>App Check.</b> При каждом запросе к нашему серверу приложение подтверждает, что это подлинная копия, через Firebase App Check: с помощью Google Play Integrity на Android и Apple App Attest на iPhone и iPad. Это начинается только тогда, когда вы начинаете покупку.",
   "<b>IP-адрес.</b> Наш сервер использует ваш IP-адрес, чтобы ограничить число запросов от одного источника в минуту. Он считает запросы с каждого адреса за текущую минуту только в памяти и не сохраняет адрес. Инфраструктура Google также записывает каждый запрос к нашему серверу вместе с IP-адресом в технические журналы нашего сервера.",
   "<b>Учёт использования.</b> Для каждого запроса рецепта наш сервер записывает в журнал одну строку с необратимо преобразованной (хешированной) формой вашего идентификатора, видом запроса, объёмом текста, который модель прочитала и написала (токены), результатом и оценочной стоимостью. В строке никогда нет ваших продуктов, аллергенов, запроса к модели или рецепта. Кроме того, наш сервер хранит под вашим идентификатором число запросов, отклонённых попыток и оценочную стоимость за текущую минуту и день, чтобы применять ограничения.",
   "<b>Дневные итоги.</b> Наш сервер хранит дневные итоги по всем пользователям вместе (запросы, рецепты, оценочная стоимость) без данных пользователей.",
@@ -193,7 +200,7 @@ T["ru"] = dict(app="Срокоед", title="Политика конфиденц�
 ("Контакты", ["<p>Есть вопросы или запросы? <a href=\""+ISSUES+"\">Создайте обращение (issue)</a> на GitHub. Обращения публичны, поэтому не указывайте в них адрес электронной почты и другие личные данные."+private_contact("Если вы не хотите отправлять запрос о персональных данных публично, напишите на {}.", "ru")+"</p>"]),
 ], home="Выберите язык")
 
-T["nb"] = dict(app="Matvakt", title="Personvernerklæring", upd="Sist oppdatert: 14. november 2026", secs=[
+T["nb"] = dict(app="Matvakt", title="Personvernerklæring", upd="Sist oppdatert: 15. november 2026", secs=[
 ("Kort fortalt", ["<p>Matvakt oppbevarer matvarene dine på telefonen din. Du trenger ingen konto, og det finnes ingen reklame og ingen analyse. Utenom krasjrapporter (se «Krasjrapporter») mottar vi data bare fra dem som kjøper oppskrifter, og bare etter at de har startet et kjøp (se «Kjøp av oppskrifter»). Kjøper du ikke oppskrifter, endres ingenting for deg. Vi selger ikke personopplysningene dine.</p>"]),
 ("Hvem som er ansvarlig", ["<p>Behandlingsansvarlig er Daniil Pastuhov, Norge: enkeltpersonen som utvikler og publiserer Matvakt, og som er ansvarlig for dataene som er beskrevet i denne erklæringen. Se «Kontakt» for hvordan du når ham.</p>"]),
 ("Hva appen lagrer", ["<p>Matvarer, utløpsdatoer, handleliste, innstillinger (også allergenlisten og matlagingsvalgene dine), bilder av produkter, lagrede oppskrifter og butikker du har lagret, lagres bare i appens lokale database på enheten din. De sendes ikke til oss. Det eneste unntaket er en forespørsel om oppskrift fra serveren vår, som du sender selv (med «Send alle varer» på inneholder den alle matvarene dine); se «Oppskrifter fra serveren vår».</p>"]),
@@ -204,7 +211,7 @@ T["nb"] = dict(app="Matvakt", title="Personvernerklæring", upd="Sist oppdatert:
 ("Varsler, sikkerhetskopier og deling", ["<ul><li>Påminnelser om utløpsdatoer og sammendrag planlegges lokalt på enheten din.</li><li>Eksport av sikkerhetskopi og deling av handleliste eller oppskriftsidé skjer bare når du velger det, og går dit du sender det.</li><li>Telefonens egen sikkerhetskopi (Google eller iCloud) kan inneholde appens data. Det styres av enhetens innstillinger, ikke av oss.</li></ul>"]),
 ("Oppskrifter", ["<p>I Oppskrift-fanen kan du få en oppskrift ut fra varene du krysser av, på tre måter:</p>", L(
   "<b>Del eller kopier en ledetekst (gratis).</b> Appen skriver en tekst og gir den til appen du velger, eller kopierer den. Vi mottar ingenting. Hva som skjer videre, avgjøres av den appen og dens egen personvernerklæring.",
-  "<b>På denne telefonen (gratis).</b> På telefoner som støtter det, skriver telefonens egen modell oppskriften (Gemini Nano på Android, Apple Foundation Models på iPhone). Ingenting sendes til oss.",
+  "<b>På denne telefonen (gratis).</b> På telefoner som støtter det, skriver telefonens egen modell oppskriften (Gemini Nano på Android, Apple Foundation Models på iPhone og iPad). Ingenting sendes til oss.",
   "<b>Fra serveren vår (betalt).</b> Du kjøper oppskrifter i Google Play eller App Store, og serveren vår skriver hver oppskrift eller meny for tre dager."),
   "<p>Slår du på <b>Send alle varer</b> i Oppskriftsinnstillinger, tilbys også resten av matvarene dine til oppskriften, som varer den kan bruke i tillegg til dem du har krysset av. Det er av med mindre du slår det på. Når det er på, tar den delte ledeteksten også med disse varene, og en oppskrift fra serveren vår sender dem som beskrevet under «Oppskrifter fra serveren vår»; telefonens egen modell sender fortsatt ingenting noe sted. Slår du det av, sendes de ikke med senere forespørsler.</p>",
   "<p>De neste seks avsnittene gjelder bare hvis du starter et kjøp av oppskrifter.</p>"]),
@@ -221,12 +228,12 @@ T["nb"] = dict(app="Matvakt", title="Personvernerklæring", upd="Sist oppdatert:
   "matlagingsvalgene dine: vanskelighetsgrad, detaljnivå, porsjoner, tid, måltid, diett og språk;",
   "allergenlisten fra Innstillinger;",
   "dagens dato og et tilfeldig forespørselsnummer."),
-  "<p>Serveren vår sender varene (også dem som sendes med «Send alle varer»), valgene, allergenene og datoen videre til Googles Gemini-modell i Vertex AI, som skriver oppskriften. Ingen navn, e-postadresse eller enhetsidentifikator sendes til modellen. Vi bruker Vertex AIs «globale» endepunkt (global), så Google kan behandle forespørselen utenfor EU/EØS. Google behandler den som vår tjenesteleverandør etter Google Clouds vilkår; se <a href=\""+VERTEX+"\">Googles side om datastyring i Vertex AI</a>.</p>",
+  "<p>Serveren vår sender varene (også dem som sendes med «Send alle varer»), valgene, allergenene og datoen videre til Googles Gemini-modell i Vertex AI, som skriver oppskriften. Ingen navn, e-postadresse eller enhetsidentifikator sendes til modellen. Vi bruker Vertex AIs «globale» endepunkt (global), så Google kan behandle forespørselen utenfor EU/EØS. Google behandler den som vår tjenesteleverandør etter Google Clouds vilkår; se <a href=\""+VERTEX+"\">Googles side om datastyring i Vertex AI (som nå heter «Gemini Enterprise Agent Platform and zero data retention»)</a>.</p>",
   "<p>Allergenlisten din kan si noe om helsen din, så vi behandler den som helseopplysninger. Appen sender den til serveren vår bare med ditt uttrykkelige samtykke (personvernforordningen artikkel 9 nr. 2 bokstav a): før din første forespørsel om oppskrift til serveren vår mens allergener er satt, viser et kort steg hva som sendes, hvorfor og til hvem, og du godtar eller avbryter. Appen lagrer svaret ditt, med dato, på telefonen. Du kan når som helst trekke tilbake samtykket under Oppskrift → Oppskriftsinnstillinger; da skriver ikke serveren vår oppskrifter mens allergener er satt, fordi en oppskrift skrevet uten dem kan være utrygg (de gratis måtene, telefonens egen modell og den delte ledeteksten, virker fortsatt og sender ingenting til oss). Allergenlisten brukes bare til å skrive oppskriften og kontrollere svaret, og den lagres ikke.</p>",
   "<p>Serveren vår kontrollerer forespørsler og svar automatisk, for å hindre at modellen misbrukes: den avviser vare- eller allergennavn som ikke ser ut som navn på mat, og svar som for eksempel inneholder lenker, kontaktopplysninger, et allergen fra listen din eller tekst som ikke handler om matlaging. Et avvist navn eller svar blir ikke lagret eller logget. Serveren vår teller avviste forsøk under identifikatoren din for inneværende døgn og logger regelen som avviste dem, med en enveis omgjort (hashet) form av identifikatoren din; etter flere slike på ett døgn avvises forespørsler om oppskrifter fra kontoen din til neste døgn.</p>",
   "<p>Vi logger ikke og tar ikke vare på det du sender, verken varene du krysset av eller resten av matvarene dine. Serveren vår lagrer bare et fingeravtrykk (en hash) av forespørselen, slik at en gjentatt forespørsel kan kjennes igjen og ikke belastes to ganger. Oppskriften eller menyen som skrives tilbake, og som nevner ingrediensene den bruker, lagres på serveren vår i 7 dager, slik at appen fortsatt kan hente den hvis forbindelsen blir brutt. Deretter slettes den automatisk (Googles automatiske sletting skjer vanligvis innen et døgn etter det). Appen lagrer oppskriften på telefonen din, der den blir til du sletter den.</p>"]),
 ("Tekniske data for kjøpere", [L(
-  "<b>App Check.</b> Ved hver forespørsel til serveren vår beviser appen at den er en ekte kopi, gjennom Firebase App Check: med Google Play Integrity på Android og Apple App Attest på iPhone. Dette starter først når du starter et kjøp.",
+  "<b>App Check.</b> Ved hver forespørsel til serveren vår beviser appen at den er en ekte kopi, gjennom Firebase App Check: med Google Play Integrity på Android og Apple App Attest på iPhone og iPad. Dette starter først når du starter et kjøp.",
   "<b>IP-adresse.</b> Serveren vår bruker IP-adressen din til å begrense hvor mange forespørsler én kilde kan sende i minuttet. Den teller forespørsler per adresse for inneværende minutt bare i minnet, og lagrer ikke adressen. Googles infrastruktur registrerer også hver forespørsel til serveren vår, med IP-adressen, i serverens tekniske logger.",
   "<b>Bruksdata.</b> For hver forespørsel om oppskrift logger serveren vår én linje med en enveis omgjort (hashet) form av identifikatoren din, typen forespørsel, hvor mye tekst modellen leste og skrev (tokens), resultatet og den anslåtte kostnaden. Linjen inneholder aldri varene dine, allergenene, ledeteksten eller oppskriften. Serveren vår lagrer også, under identifikatoren din, antall forespørsler, avviste forsøk og anslått kostnad i inneværende minutt og døgn, for å håndheve grenser.",
   "<b>Daglige totaler.</b> Serveren vår lagrer daglige totaler for alle brukere samlet (forespørsler, oppskrifter, anslått kostnad), uten brukerdata.",
@@ -322,12 +329,13 @@ SUPPORT = [
 ]
 body = '<nav>' + " ".join(f'<a href="#{c}">{n}</a>' for c, n in NAV) + '</nav>'
 for code, title, secs in SUPPORT:
-    body += f'<section id="{code}" lang="{code}"><h1>{title}</h1>' + "".join(f"<h2>{h}</h2>{p}" for h, p in secs) + "</section><hr>"
+    body += f'<section id="{code}" lang="{code}"><h2 class="name">{title}</h2>' + "".join(f"<h3>{h}</h3>{p}" for h, p in secs) + "</section><hr>"
 open("support.html", "w", encoding="utf-8").write(f"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 {ICONS}
-<title>BestBefore — Support</title><style>{CSS} hr{{border:0;border-top:1px solid var(--bd);margin:40px 0}}</style></head>
-<body><main>{body}<p class="mut"><a href="index.html">Privacy Policy</a></p></main></body></html>""")
+<title>BestBefore — Support</title><style>{CSS} hr{{border:0;border-top:1px solid var(--bd);margin:40px 0}}
+{MULTI_CSS}</style></head>
+<body><main>{multi_h1([(c, t) for c, t, _ in SUPPORT])}{body}<p class="mut"><a href="index.html">Privacy Policy</a></p></main></body></html>""")
 s = open("index.html", encoding="utf-8").read()
 if "support.html" not in s:
     s = s.replace('</div></main>', '</div><p><a href="support.html">Support · Поддержка · Brukerstøtte</a></p></main>')
@@ -404,12 +412,13 @@ DELETE = [
 ]
 body = '<nav>' + " ".join(f'<a href="#{c}">{n}</a>' for c, n in NAV) + '</nav>'
 for code, title, policy, secs in DELETE:
-    body += f'<section id="{code}" lang="{code}"><h1>{title}</h1>' + "".join((f"<h2>{h}</h2>" if h else "") + p for h, p in secs) + f'<p class="mut"><a href="{code}.html">{policy}</a></p></section><hr>'
+    body += f'<section id="{code}" lang="{code}"><h2 class="name">{title}</h2>' + "".join((f"<h3>{h}</h3>" if h else "") + p for h, p in secs) + f'<p class="mut"><a href="{code}.html">{policy}</a></p></section><hr>'
 open("delete.html", "w", encoding="utf-8").write(f"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 {ICONS}
-<title>BestBefore — Delete your account and data</title><meta name="robots" content="index,follow"><style>{CSS} hr{{border:0;border-top:1px solid var(--bd);margin:40px 0}}</style></head>
-<body><main>{body}<p class="mut"><a href="index.html">BestBefore</a> · <a href="support.html">Support</a></p></main></body></html>""")
+<title>BestBefore — Delete your account and data</title><meta name="robots" content="index,follow"><style>{CSS} hr{{border:0;border-top:1px solid var(--bd);margin:40px 0}}
+{MULTI_CSS}</style></head>
+<body><main>{multi_h1([(c, t) for c, t, _, _ in DELETE])}{body}<p class="mut"><a href="index.html">BestBefore</a> · <a href="support.html">Support</a></p></main></body></html>""")
 s = open("index.html", encoding="utf-8").read()
 if "delete.html" not in s:
     s = s.replace('</main></body>', '<p><a href="delete.html">Delete your account and data · Удаление аккаунта и данных · Slett kontoen og dataene dine</a></p></main></body>')
@@ -425,8 +434,6 @@ APP_CSS = """.lead{font-size:1.1rem}.shots{display:grid;grid-template-columns:re
 @media(min-width:640px){.shots{grid-template-columns:repeat(4,1fr)}}
 .shots img{width:100%;height:auto;display:block;border-radius:10px;border:1px solid var(--bd)}
 .btn{display:inline-block;padding:10px 18px;border-radius:10px;background:var(--ac);color:var(--bg);font-weight:600;text-decoration:none}
-h2.name{font-size:1.9rem;line-height:1.2;margin:.2em 0}h3{font-size:1.2rem;margin:2em 0 .4em}
-.vh{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 .get p{margin:.8em 0}.get .mut{white-space:nowrap}hr{border:0;border-top:1px solid var(--bd);margin:40px 0}"""
 ABOUT = [
  ("en", "BestBefore", "An expiry date tracker for your fridge, freezer and cupboard", [
@@ -506,8 +513,9 @@ open("app.html", "w", encoding="utf-8").write(f"""<!doctype html>
 <meta property="og:image:width" content="360"><meta property="og:image:height" content="782">
 <meta property="og:image:alt" content="{html.escape(ABOUT[0][3][0])}"><meta name="twitter:card" content="summary">
 <meta name="robots" content="index,follow"><style>{CSS}
+{MULTI_CSS}
 {APP_CSS}</style></head>
-<body><main><h1 class="vh">BestBefore · <span lang="ru">Срокоед</span> · <span lang="nb">Matvakt</span></h1>{body}<p class="mut"><a href="index.html">Privacy Policy</a> · <a href="support.html">Support</a></p></main></body></html>""")
+<body><main>{multi_h1([(a[0], a[1]) for a in ABOUT])}{body}<p class="mut"><a href="index.html">Privacy Policy</a> · <a href="support.html">Support</a></p></main></body></html>""")
 s = open("index.html", encoding="utf-8").read()
 if "app.html" not in s:
     s = s.replace('<div class="langs">', '<p><a href="app.html">About the app · О приложении · Om appen</a></p><div class="langs">', 1)
